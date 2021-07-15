@@ -69,7 +69,13 @@ class SiteController extends Controller
 
         $tags = $model->find()->all();
 
-        $selectedModel = $model->find()->where(['id' => $id])->orWhere(['title' => 'животные'])->one();
+        if($id){
+            $selectedModel = $model->find()->where(['id' => $id])->one();
+            
+        }else{
+            $selectedModel = $model->find()->where(['title' => 'животные'])->one();
+        }
+        
         $categories = !empty($selectedModel) ? $selectedModel->categories : [];
 
         return $this->render('all',['tags' => $tags, 'categories' => $categories, 'selected' => $selectedModel]);

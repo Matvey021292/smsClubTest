@@ -16,8 +16,10 @@ $this->title = 'My Yii Application';
                         <?php
                             foreach ($tags as $key => $tag): ?>
                                 <option <?= !empty($selected) && $selected->id == $tag->id ? 'selected' : ''?> value="<?=  $tag->id ?>"><?= $tag->title; ?></option>
-                            <?php endforeach;
-                        ?>
+                            <?php endforeach;?>
+                            <?php if(empty($selected)): ?>
+                                <option selected>Выберите тему</option>
+                            <?php endif;?>
                         </select>
                     </form>
                 </div>
