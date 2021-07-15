@@ -30,7 +30,7 @@ path - 'smsClubTest/config/db.php'
 ~~~
 
 
-Running Migrations
+Run Migrations
 ------------
 ~~~
 ./yii migrate/up
