@@ -2,38 +2,33 @@
 
 /* @var $this yii\web\View */
 
-use yii\bootstrap\Collapse;
+use yii\grid\GridView;
+use yii\widgets\Pjax;
 
 $this->title = 'My Yii Application';
 ?>
 <div class="site-index">
-    <?php if (!empty($tags)): ?>
-        <div class="body-content">
-            <div class="row">
-                <div class="col-md-12">
-                    <form action="">
-                        <select  onchange="this.form.submit()" class="form-control" name="tag">
-                        <?php
-                            foreach ($tags as $key => $tag): ?>
-                                <option <?= !empty($selected) && $selected->id == $tag->id ? 'selected' : ''?> value="<?=  $tag->id ?>"><?= $tag->title; ?></option>
-                            <?php endforeach;?>
-                            <?php if(empty($selected)): ?>
-                                <option selected>Выберите тему</option>
-                            <?php endif;?>
-                        </select>
-                    </form>
-                </div>
-                <hr>
-                <ul>
-                    <?php
-                    if (!empty($categories)):
-                        foreach ($categories as $key => $category): ?>
-                            <li><?= $category->title; ?></li>
-                        <?php endforeach;
-                    endif;
-                    ?>
-                </ul>
+    <div class="body-content">
+        <div class="row">
+            <div class="col-md-12">
+                <?= $this->render('_form', [
+                    'model' => $model,
+                    'active' => $active
+                ]) ?>
+
+                <?php
+                Pjax::begin(['id' => 'lists']);
+                echo GridView::widget([
+                    'dataProvider' => $dataProvider,
+                    'filterModel' => $searchModel,
+                    'columns' => [
+                        'title:ntext',
+                    ],
+                ]);
+                Pjax::end();
+                ?>
             </div>
+            <hr>
         </div>
-    <?php endif; ?>
+    </div>
 </div>

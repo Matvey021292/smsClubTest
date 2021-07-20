@@ -9,34 +9,36 @@ use yii\db\Migration;
  */
 class m210715_190328_insert_data_tag_category extends Migration
 {
+    const URL_SITE_SOURCE = 'https://www.olx.ua/sitemap/';
+
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
 
-        $url = 'https://www.olx.ua/sitemap/';
-
         $dom = new Dom;
-        $dom->loadFromUrl($url, (new Options())->setWhitespaceTextNode(false));
+        $dom->loadFromUrl(self::URL_SITE_SOURCE, (new Options())->setWhitespaceTextNode(false));
         $tags = $dom->find('.col');
         $i = 0;
         foreach ($tags as $tag) {
             $titles = $tag->find('h3');
-            foreach ($titles as  $title) {
+            foreach ($titles as $title) {
                 $i++;
-                $this->insert('tag',array(
-                    'title'=> $title->innerText,
-                ));
+                $this->insert('tag', [
+                    'title' => $title->innerText,
+                ]);
                 $lists = $title->nextSibling();
-                foreach ($lists as $list){
+                foreach ($lists as $list) {
+
+                    $linksMap = [];
                     $links = $list->find('a');
-                    foreach ($links as $link){
-                        $this->insert('category',array(
-                            'title'=> $link->innerText,
-                            'tag_id' => $i,
-                        ));
+
+                    foreach ($links as $link) {
+                        $linksMap[] = [$link->title, $i];
                     }
+
+                    $this->batchInsert('category', ['title', 'tag_id'], $linksMap);
                 }
             }
         }
@@ -47,7 +49,7 @@ class m210715_190328_insert_data_tag_category extends Migration
      */
     public function safeDown()
     {
-        return false;
+
     }
 
     /*

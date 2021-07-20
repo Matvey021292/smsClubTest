@@ -2,39 +2,22 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "Tag".
+ * This is the model class for table "Category".
  *
  * @property int $id
+ * @property-read ActiveQuery $tag
  * @property string $name
  */
-class Category extends \yii\db\ActiveRecord
+class Category extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * @return ActiveQuery
      */
-    public static function tableName()
-    {
-        return 'category';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'title' => Yii::t('common', 'Name'),
-        ];
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTag()
+    public function getTag(): ActiveQuery
     {
         return $this->hasOne(Tag::class, ['id' => 'tag_id']);
     }

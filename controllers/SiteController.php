@@ -2,18 +2,17 @@
 
 namespace app\controllers;
 
+use app\models\SearchCategory;
 use app\models\Tag;
 use Yii;
-use yii\base\BaseObject;
 use yii\filters\AccessControl;
 use yii\web\Controller;
-use yii\web\Response;
 use yii\filters\VerbFilter;
-use app\models\LoginForm;
-use app\models\ContactForm;
 
 class SiteController extends Controller
 {
+    const DEFAULT_TAG_ID = 10;
+
     /**
      * {@inheritdoc}
      */
@@ -61,24 +60,23 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
-        $id = Yii::$app->request->get('tag') ? Yii::$app->request->get('tag') : 0;
+        $tagModel = new Tag();
+        $searchModel = new SearchCategory();
 
-        $model = new Tag();
+        $queryParams = Yii::$app->request->queryParams;
+        $queryParams['tag'] = $queryParams['tag'] ?? self::DEFAULT_TAG_ID;
 
-        $tags = $model->find()->all();
+        $dataProvider = $searchModel->search($queryParams);
 
-        if($id){
-            $selectedModel = $model->find()->where(['id' => $id])->one();
-            
-        }else{
-            $selectedModel = $model->find()->where(['title' => 'животные'])->one();
-        }
-        
-        $categories = !empty($selectedModel) ? $selectedModel->categories : [];
-
-        return $this->render('all',['tags' => $tags, 'categories' => $categories, 'selected' => $selectedModel]);
+        return $this->render('all',
+            [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'model' => $tagModel,
+                'active' => $queryParams['tag']
+            ]);
     }
 
     /**
@@ -86,11 +84,22 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionAll()
+    public function actionAll(): string
     {
-        $model = new Tag();
-        $tags = $model->find()->all();
-        return $this->render('index', compact('tags'));
+        $items = [];
+
+        $modelTag = new Tag();
+        $tags = $modelTag->find()->all();
+
+        foreach ($tags as $k => $tag) {
+            $items[$k]['label'] = $tag->title;
+            if (!empty($tag->categories)) {
+                foreach ($tag->categories as $key => $category) {
+                    $items[$k]['content'][] = $category->title;
+                }
+            }
+        }
+        return $this->render('index', ['items' => $items]);
     }
 
 }
